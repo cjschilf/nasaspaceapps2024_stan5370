@@ -6,7 +6,7 @@ To run the compiler, the following dependencies are required:
 - CIRCT
 - (LLVM/MLIR)
 
-These can be installed by running `./setup` in the current directory (`compiler/`).
+These can be installed by running `./install` in the current directory (`compiler/`).
 
 Installing these requires `cmake`, `git`, and `ninja`. If you're messing with PyTorch, you probably have Python installed.
 
