@@ -2,15 +2,15 @@
 
 To run the compiler, the following dependencies are required:
 
-- LLVM/MLIR
 - Torch-MLIR
 - CIRCT
+- (LLVM/MLIR)
 
 These can be installed by running `./install-dependencies.sh` in the current directory (`compiler/`).
 
-Installing these requires `cmake`, `git`, `ninja`.
+Installing these requires `cmake`, `git`, and `ninja`. If you're messing with PyTorch, you probably have Python installed.
 
 # Running the compiler
+To enable, run `source enable` in the current directory (`compiler/`). This should add `torchscript-to-verilog` to your path.
 
-To run the compiler, run `./compile <TBD>`. This should generate a `*.v` file.
-
+From here, you can run `torchscript-to-verilog <path-to-torchscript-file>` to get a `*.v` file.
