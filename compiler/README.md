@@ -8,9 +8,9 @@ To run the compiler, the following dependencies are required:
 
 These can be installed by running `./install` in the current directory (`compiler/`).
 
-Installing these requires `cmake`, `git`, and `ninja`. If you're messing with PyTorch, you probably have Python installed.
+Installing these requires `cmake`, `git`, and `ninja`. If you're messing with PyTorch, you probably have Python installed, but it's worth mentioning I guess.
 
 # Running the compiler
-To enable, run `source enable` in the current directory (`compiler/`). This should add `torchscript-to-verilog` to your path.
+To enable, run `source enable` in the current directory (`compiler/`). This should add all binaries and dependencies to your path.
 
-From here, you can run `torchscript-to-verilog <path-to-torchscript-file>` to get a `*.v` file.
+From here, you can run `pytorch-to-scf` to lower down to SCF, and `scf-to-verilog` to compile to Verilog.
