@@ -54,10 +54,10 @@ rm -rf temp/*
 
 
 # Pytorch -> TorchScript -> Torch
-python3 pytorch-to-torch.py $INPUT_FILE
+python3 compiler/bin/pytorch-to-torch.py $INPUT_FILE
 
 # Torch -> SCF
-torch-mlir-opt --convert-torch-to-scf temp/torch.mlir -o $OUTPUT_FILE
+torch-mlir-opt --canonicalize --convert-torch-to-scf temp/torch.mlir -o $OUTPUT_FILE
 
 
 # Cleanup

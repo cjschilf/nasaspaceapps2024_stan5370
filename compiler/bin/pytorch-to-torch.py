@@ -2,7 +2,8 @@ import os
 import sys
 
 import torch
-from torch_mlir import torchscript
+from torch import nn
+import torch_mlir
 
 # Make sure venv is activated
 cur_dir = os.path.dirname(os.path.abspath(__file__))
@@ -14,10 +15,10 @@ path = sys.argv[1]
 model = torch.load(path)
 model.eval()
 
+
 # Convert the PyTorch model to torch
-example_data = [] # TODO: ADD DATA!!!!!!!!!!!!!
-module = torchscript.compile(
-        model, example_data, output_type=torchscript.OutputType.TORCH
-        )
-with open(cur_dir + "temp/torch.mlir", "w+") as f:
-    f.write(module.operation.get_asm())
+compile = torch.compile(model, backend="inductor")
+print(compile)
+
+# with open(cur_dir + "temp/torch.mlir", "w+") as f:
+#     f.write(module.operation.get_asm())
