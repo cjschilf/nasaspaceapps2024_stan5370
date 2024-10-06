@@ -1,6 +1,0 @@
-#!/bin/bash
-
-
-
-# Check if torch-mlir and CIRCT are on the path
-

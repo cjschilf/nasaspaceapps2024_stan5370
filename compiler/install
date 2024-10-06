@@ -19,14 +19,10 @@ if [ -d "deps" ]; then
   echo
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     rm -rf deps
-    echo "Deleted deps directory"
   else
-    echo "Exiting"
     exit 0
   fi
 fi
-
-echo "asdasdasd"
 
 
 # create deps directory
