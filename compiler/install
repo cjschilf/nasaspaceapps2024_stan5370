@@ -6,7 +6,7 @@ DCMAKE_BUILD_TYPE=RelWithDebInfo
 
 # check if current directory is compiler
 if [ ! "$(basename $PWD)" = "compiler" ]; then
-  echo "script not run in compiler directory"
+  echo "Script not run in compiler directory."
   exit 1
 fi
 
