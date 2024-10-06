@@ -1,6 +1,4 @@
-#!/bin/bash
-
-set -e
+#!/bin/bash -e
 
 
 DCMAKE_BUILD_TYPE=RelWithDebInfo
@@ -79,6 +77,6 @@ cmake --build build --target tools/torch-mlir/all
 # Create enable script
 echo *** CREATING ENABLE SCRIPT ***
 cd ../../
-echo "export PATH=$PWD/deps/circt/build/bin:$PWD/deps/torch-mlir/build/bin:\$PATH" > enable
-echo "Dependencies installed. Run 'source enable' to add CIRCT and Torch-MLIR binaries to PATH."
+echo "export PATH=$PWD/bin:$PWD/deps/circt/build/bin:$PWD/deps/circt/llvm/build/bin:$PWD/deps/torch-mlir/build/bin:\$PATH" > enable
+echo "Dependencies installed. Run 'source enable' to add relevant binaries to PATH."
 exit 0
