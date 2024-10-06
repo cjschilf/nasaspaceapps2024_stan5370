@@ -54,20 +54,20 @@ rm -rf temp/*
 
 
 # SCF + SCF -> Calyx
-mlir-opt -scf-for-loop-canonicalization -scf-for-loop-peeling -scf-for-loop-range-folding -scf-bufferize -scf-for-to-while $INPUT_FILE -o temp/scf-optimized.mlir
-circt-opt -lower-scf-to-calyx temp/scf-optimized.mlir -o temp/scf-to-calyx.mlir
+mlir-opt --scf-for-loop-canonicalization --scf-for-loop-peeling --scf-for-loop-range-folding --scf-bufferize --scf-for-to-while $INPUT_FILE -o temp/scf-optimized.mlir
+circt-opt --lower-scf-to-calyx temp/scf-optimized.mlir -o temp/scf-to-calyx.mlir
 
 # Calyx -> HW
-circ-opt -calyx-remove-comb-groups -calyx-compile-control temp/scf-to-calyx.mlir -o temp/calyx-optimized.mlir
-circ-opt -lower-calyx-to-hw temp/calyx-optimized.mlir -o temp/calyx-to-hw.mlir
+circ-opt --calyx-remove-comb-groups --calyx-compile-control temp/scf-to-calyx.mlir -o temp/calyx-optimized.mlir
+circ-opt --lower-calyx-to-hw temp/calyx-optimized.mlir -o temp/calyx-to-hw.mlir
 
 # HW -> SV
-circ-opt -hw-flatten-modules -hw-specialize -hw-eliminate-inout-ports -hw-legalize-modules -hw-cleanup temp/calyx-to-hw.mlir -o temp/hw-optimized.mlir
-circ-opt -lower-hw-to-sv temp/hw-optimized.mlir -o temp/hw-to-sv.mlir
+circ-opt --hw-flatten-modules --hw-specialize --hw-eliminate-inout-ports --hw-legalize-modules --hw-cleanup temp/calyx-to-hw.mlir -o temp/hw-optimized.mlir
+circ-opt --lower-hw-to-sv temp/hw-optimized.mlir -o temp/hw-to-sv.mlir
 
 # SV -> Verilog
-circ-opt -prettify-verilog temp/hw-to-sv.mlir -o temp/sv-pretty.mlir
-circ-opt -export-verilog temp/sv-pretty.mlir -o $OUTPUT_FILE
+circ-opt --prettify-verilog temp/hw-to-sv.mlir -o temp/sv-pretty.mlir
+circ-opt --export-verilog temp/sv-pretty.mlir -o $OUTPUT_FILE
 
 
 # Cleanup

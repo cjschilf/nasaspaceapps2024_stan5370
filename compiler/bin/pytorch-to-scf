@@ -53,14 +53,11 @@ mkdir -p temp
 rm -rf temp/*
 
 
-# Pytorch -> TorchScript
-# TODO
-
-# TorchScript -> Torch
-# TODO
+# Pytorch -> TorchScript -> Torch
+python3 pytorch-to-torch.py $INPUT_FILE
 
 # Torch -> SCF
-# TODO
+torch-mlir-opt --convert-torch-to-scf temp/torch.mlir -o $OUTPUT_FILE
 
 
 # Cleanup

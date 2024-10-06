@@ -8,7 +8,7 @@ To run the compiler, the following dependencies are required:
 
 These can be installed by running `./install` in the current directory (`compiler/`).
 
-Installing these requires `cmake`, `git`, and `ninja`. If you're messing with PyTorch, you probably have Python installed, but it's worth mentioning I guess.
+Installing these requires `cmake`, `git`, and `ninja`. You should probably have Python 3.11 or greater. You also want to have the appropriate `python-dev` package installed.
 
 # Running the compiler
 To enable, run `source enable` in the current directory (`compiler/`). This should add all binaries and dependencies to your path.

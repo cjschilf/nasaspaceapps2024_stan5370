@@ -63,6 +63,11 @@ echo *** BUILDING TORCH-MLIR ***
 cd ../../
 git clone https://github.com/llvm/torch-mlir; cd torch-mlir
 git submodule update --init --progress
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pip install -r torchvision-requirements.txt
+pip install torch-mlir -f https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
 cmake -GNinja -Bbuild \
   -DCMAKE_BUILD_TYPE=Release \
   -DPython3_FIND_VIRTUALENV=ONLY \
@@ -71,12 +76,13 @@ cmake -GNinja -Bbuild \
   -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
   -DLLVM_TARGETS_TO_BUILD=host \
   .
-cmake --build build --target tools/torch-mlir/all
+cmake --build build --target tools/torch-mlir/all # again, might have to limit cores with -j
 
 
 # Create enable script
 echo *** CREATING ENABLE SCRIPT ***
 cd ../../
 echo "export PATH=$PWD/bin:$PWD/deps/circt/build/bin:$PWD/deps/circt/llvm/build/bin:$PWD/deps/torch-mlir/build/bin:\$PATH" > enable
+echo "export PYTHONPATH=$PWD/deps/torch-mlir/build/tools/torch-mlir/python_packages/torch_mlir" >> enable
 echo "Dependencies installed. Run 'source enable' to add relevant binaries to PATH."
 exit 0
