@@ -16,6 +16,6 @@ The neural network (Colin) is in the **home directory** of the repo.
 
 The `verilog` directory (Josh) contains the code for the FPGA preprocessor.
 
-The `TBD` directory (Shannon) contains the experimental code for hand-tuning parameters and additional filters.
+The `no_ml` directory (Shannon) contains the experimental code for hand-tuning parameters and additional filters.
 
-The `compiler` directory (Ben) contains experimental code to install and run the pytorch-to-verilog compiler. It doesn't work, but is *very* close to working.
+The `compiler` directory (Ben) contains experimental code to install and run the pytorch-to-verilog compiler. The PyTorch frontend is broken, but the rest of the lowering works.
