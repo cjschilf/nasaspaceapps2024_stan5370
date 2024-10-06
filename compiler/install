@@ -50,14 +50,14 @@ echo *** BUILDING CIRCT ***
 cd ../../
 mkdir build; cd build
 cmake -G Ninja .. \
-    -DMLIR_DIR="../llvm/build/lib/cmake/mlir" \
-    -DLLVM_DIR="../llvm/build/lib/cmake/llvm" \
+    -DMLIR_DIR="$PWD/../llvm/build/lib/cmake/mlir" \
+    -DLLVM_DIR="$PWD/../llvm/build/lib/cmake/llvm" \
     -DLLVM_ENABLE_ASSERTIONS=ON \
     -DCMAKE_BUILD_TYPE=$DCMAKE_BUILD_TYPE \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 ninja
 ninja check-circt
-ninja check-circt-integration
+ninja check-circt-integration # this one might fail for deps reasons
 
 
 # Build Torch-MLIR
@@ -68,8 +68,8 @@ git submodule update --init --progress
 cmake -GNinja -Bbuild \
   -DCMAKE_BUILD_TYPE=Release \
   -DPython3_FIND_VIRTUALENV=ONLY \
-  -DMLIR_DIR="../circt/llvm/build/lib/cmake/mlir/" \
-  -DLLVM_DIR="../circt/llvm/build/lib/cmake/llvm/" \
+  -DMLIR_DIR="$PWD/../circt/llvm/build/lib/cmake/mlir" \
+  -DLLVM_DIR="$PWD/../circt/llvm/build/lib/cmake/llvm" \
   -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
   -DLLVM_TARGETS_TO_BUILD=host \
   .
