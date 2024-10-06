@@ -13,7 +13,7 @@ if [ ! "$(basename $PWD)" = "compiler" ]; then
 fi
 
 
-# if deps folder exists, ask whether user wants to reinstall deps. if Y (default), delete; if n, exit
+# if deps folder exists, ask whether user wants to reinstall deps
 if [ -d "deps" ]; then
   read -p "Directory deps exists. Do you want to reinstall dependencies? (Y/n) " -n 1 -r
   echo
@@ -31,6 +31,7 @@ cd deps
 
 
 # clone CIRCT and build LLVM/MLIR
+echo *** CLONING CIRCT, BUILDING LLVM/MLIR ***
 git clone https://github.com/llvm/circt.git; cd circt
 git submodule init; git submodule update
 mkdir llvm/build; cd llvm/build
@@ -45,6 +46,7 @@ ninja check-mlir
 
 
 # Build CIRCT
+echo *** BUILDING CIRCT ***
 cd ../../
 mkdir build; cd build
 cmake -G Ninja .. \
@@ -59,6 +61,7 @@ ninja check-circt-integration
 
 
 # Build Torch-MLIR
+echo *** BUILDING TORCH-MLIR ***
 cd ../../
 git clone https://github.com/llvm/torch-mlir; cd torch-mlir
 git submodule update --init --progress
@@ -73,7 +76,8 @@ cmake -GNinja -Bbuild \
 cmake --build build --target tools/torch-mlir/all
 
 
-# Create enable script that adds CIRCT and Torch-MLIR binaries to PATH
+# Create enable script
+echo *** CREATING ENABLE SCRIPT ***
 cd ../../
 echo "export PATH=$PWD/deps/circt/build/bin:$PWD/deps/torch-mlir/build/bin:\$PATH" > enable
 echo "Dependencies installed. Run 'source enable' to add CIRCT and Torch-MLIR binaries to PATH."
