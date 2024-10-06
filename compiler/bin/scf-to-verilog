@@ -1,0 +1,76 @@
+#!/bin/bash -e
+
+
+function usage {
+    echo "Converts SCF-MLIR to Verilog."
+    echo "  USAGE: `basename $0` <INPUT FILE> -o <OUTPUT FILE> [<OPTIONS, ...>]"
+}
+
+
+function flags {
+    echo "  FLAGS:"
+    echo "    -h,--help"
+    echo "      Display this help message"
+    echo "    -o,--output <OUTPUT FILE>"
+    echo "      Specify the output file"
+}
+
+
+# Parse arguments
+if [[ $# -lt 1 ]]; then
+    usage
+    exit 1
+fi
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            echo ""
+            flags
+            exit 0
+            ;;
+        -o|--output)
+            OUTPUT_FILE=$2
+            shift
+            shift
+            ;;
+        *)
+            if [ -n "${INPUT_FILE}" ]; then
+                echo "Too many positional arguments passed."
+                usage
+                exit 1
+            fi
+            INPUT_FILE=$1
+            shift
+            ;;
+    esac
+done
+
+
+# Temp files for passes.
+mkdir -p temp
+rm -rf temp/*
+
+
+# SCF + SCF -> Calyx
+mlir-opt --scf-for-loop-canonicalization --scf-for-loop-peeling --scf-for-loop-range-folding --scf-bufferize --scf-for-to-while $INPUT_FILE -o temp/scf-optimized.mlir
+circt-opt --lower-scf-to-calyx temp/scf-optimized.mlir -o temp/scf-to-calyx.mlir
+
+# Calyx -> HW
+circ-opt --calyx-remove-comb-groups --calyx-compile-control temp/scf-to-calyx.mlir -o temp/calyx-optimized.mlir
+circ-opt --lower-calyx-to-hw temp/calyx-optimized.mlir -o temp/calyx-to-hw.mlir
+
+# HW -> SV
+circ-opt --hw-flatten-modules --hw-specialize --hw-eliminate-inout-ports --hw-legalize-modules --hw-cleanup temp/calyx-to-hw.mlir -o temp/hw-optimized.mlir
+circ-opt --lower-hw-to-sv temp/hw-optimized.mlir -o temp/hw-to-sv.mlir
+
+# SV -> Verilog
+circ-opt --prettify-verilog temp/hw-to-sv.mlir -o temp/sv-pretty.mlir
+circ-opt --export-verilog temp/sv-pretty.mlir -o $OUTPUT_FILE
+
+
+# Cleanup
+rm -rf temp
+
+exit 0

@@ -1,0 +1,66 @@
+#!/bin/bash -e
+
+
+function usage {
+    echo "Converts a PyTorch model to SCF-MLIR."
+    echo "  USAGE: `basename $0` <INPUT FILE> -o <OUTPUT FILE> [<OPTIONS, ...>]"
+}
+
+
+function flags {
+    echo "  FLAGS:"
+    echo "    -h,--help"
+    echo "      Display this help message"
+    echo "    -o,--output <OUTPUT FILE>"
+    echo "      Specify the output file"
+}
+
+
+# Parse arguments
+if [[ $# -lt 1 ]]; then
+    usage
+    exit 1
+fi
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            echo ""
+            flags
+            exit 0
+            ;;
+        -o|--output)
+            OUTPUT_FILE=$2
+            shift
+            shift
+            ;;
+        *)
+            if [[ -n "${INPUT_FILE}" ]]; then
+                echo "Too many positional arguments passed."
+                usage
+                exit 1
+            fi
+            INPUT_FILE=$1
+            shift
+            ;;
+    esac
+done
+
+
+# Temp files for passes.
+mkdir -p temp
+rm -rf temp/*
+
+
+# Pytorch -> TorchScript -> Torch
+python3 pytorch-to-torch.py $INPUT_FILE
+
+# Torch -> SCF
+torch-mlir-opt --convert-torch-to-scf temp/torch.mlir -o $OUTPUT_FILE
+
+
+# Cleanup
+rm -rf temp
+
+exit 0

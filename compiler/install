@@ -1,0 +1,88 @@
+#!/bin/bash -e
+
+
+DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+
+# check if current directory is compiler
+if [ ! "$(basename $PWD)" = "compiler" ]; then
+  echo "Script not run in compiler directory."
+  exit 1
+fi
+
+
+# if deps folder exists, ask whether user wants to reinstall deps
+if [ -d "deps" ]; then
+  read -p "Directory deps exists. Do you want to reinstall dependencies? (Y/n) " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    rm -rf deps
+  else
+    exit 0
+  fi
+fi
+
+
+# create deps directory
+mkdir -p deps
+cd deps
+
+
+# clone CIRCT and build LLVM/MLIR
+echo *** CLONING CIRCT, BUILDING LLVM/MLIR ***
+git clone https://github.com/llvm/circt.git; cd circt
+git submodule init; git submodule update
+mkdir llvm/build; cd llvm/build
+cmake -G Ninja ../llvm \
+    -DLLVM_ENABLE_PROJECTS="mlir" \
+    -DLLVM_TARGETS_TO_BUILD="host" \
+    -DLLVM_ENABLE_ASSERTIONS=ON \
+    -DCMAKE_BUILD_TYPE=$DCMAKE_BUILD_TYPE \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+ninja # you might have to limit cores with -j if you get random failures
+ninja check-mlir
+
+
+# Build CIRCT
+echo *** BUILDING CIRCT ***
+cd ../../
+mkdir build; cd build
+cmake -G Ninja .. \
+    -DMLIR_DIR="$PWD/../llvm/build/lib/cmake/mlir" \
+    -DLLVM_DIR="$PWD/../llvm/build/lib/cmake/llvm" \
+    -DLLVM_ENABLE_ASSERTIONS=ON \
+    -DCMAKE_BUILD_TYPE=$DCMAKE_BUILD_TYPE \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+ninja
+ninja check-circt
+ninja check-circt-integration # this one might fail for deps reasons
+
+
+# Build Torch-MLIR
+echo *** BUILDING TORCH-MLIR ***
+cd ../../
+git clone https://github.com/llvm/torch-mlir; cd torch-mlir
+git submodule update --init --progress
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pip install -r torchvision-requirements.txt
+pip install torch-mlir -f https://github.com/llvm/torch-mlir-release/releases/expanded_assets/dev-wheels
+cmake -GNinja -Bbuild \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DPython3_FIND_VIRTUALENV=ONLY \
+  -DMLIR_DIR="$PWD/../circt/llvm/build/lib/cmake/mlir" \
+  -DLLVM_DIR="$PWD/../circt/llvm/build/lib/cmake/llvm" \
+  -DMLIR_ENABLE_BINDINGS_PYTHON=ON \
+  -DLLVM_TARGETS_TO_BUILD=host \
+  .
+cmake --build build --target tools/torch-mlir/all # again, might have to limit cores with -j
+
+
+# Create enable script
+echo *** CREATING ENABLE SCRIPT ***
+cd ../../
+echo "export PATH=$PWD/bin:$PWD/deps/circt/build/bin:$PWD/deps/circt/llvm/build/bin:$PWD/deps/torch-mlir/build/bin:\$PATH" > enable
+echo "export PYTHONPATH=$PWD/deps/torch-mlir/build/tools/torch-mlir/python_packages/torch_mlir" >> enable
+echo "Dependencies installed. Run 'source enable' to add relevant binaries to PATH."
+exit 0
