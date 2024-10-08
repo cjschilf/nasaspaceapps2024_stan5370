@@ -1,6 +1,8 @@
-# nasaspaceapps2024_stan5370
+# F-STARS: FPGA Seismic Triggering and Analysis for Recognition in Space
 
 Team stan5370's submission for NASA Space Apps 2024 Chicago.
+
+https://youtu.be/ScUdFu_6Ruw?si=RgMysUUFb90X1qu3
 
 ## Overview
 
